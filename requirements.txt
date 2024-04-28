@@ -4,3 +4,4 @@ dgl
 pandas
 pyyaml
 pydantic
+tensorboardX
