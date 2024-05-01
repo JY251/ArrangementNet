@@ -145,6 +145,7 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
         q0 = (int((p0[i, 0] - xMin) / resolution), int((p0[i, 1] - yMin) / resolution))
         q1 = (int((p1[i, 0] - xMin) / resolution), int((p1[i, 1] - yMin) / resolution))
         cv2.line(img_line, q0, q1, (255, 255, 255), 1)
+        cv2.line(img_line1, q0, q1, (255, 255, 255), 1)
         if gt_wall[i] == 1:
             cv2.line(img_line, q0, q1, (0, 0, 255), 5)
         if pred_label_wall[i] == 1:
