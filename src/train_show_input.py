@@ -117,9 +117,9 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
     amplifier = 1.0
     if args.dataset == 'cyberverse':
         amplifier = 20.0
-    line_width = 5.0
+    line_width = 5
     if args.dataset == 'structured3d':
-        line_width = 1.0
+        line_width = 1
     p0 = p0.data.cpu().numpy() * amplifier
     p1 = p1.data.cpu().numpy() * amplifier
     p2 = p2.data.cpu().numpy() * amplifier
