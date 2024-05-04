@@ -138,6 +138,7 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
     w = int((xMax - xMin) / resolution)
     img_line = np.zeros((h, w, 3), dtype='uint8')
     img_line1 = np.zeros((h, w, 3), dtype='uint8')
+    img_line2 = np.zeros((h, w, 3), dtype='uint8')
     p0 = sample_batched['g'].edata['p0'].data.cpu().numpy()
     p1 = sample_batched['g'].edata['p1'].data.cpu().numpy()
     p0 = p0 * amplifier
@@ -149,14 +150,22 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
         q1 = (int((p1[i, 0] - xMin) / resolution), int((p1[i, 1] - yMin) / resolution))
         cv2.line(img_line, q0, q1, (255, 255, 255), 1)
         cv2.line(img_line1, q0, q1, (255, 255, 255), 1)
+        cv2.line(img_line2, q0, q1, (255, 255, 255), 1)
         if gt_wall[i] == 1:
             cv2.line(img_line, q0, q1, (0, 0, 255), line_width)
         if pred_label_wall[i] == 1:
             cv2.line(img_line1, q0, q1, (0, 255, 0), line_width)
         elif pred_label_wall[i] == 2:
             cv2.line(img_line1, q0, q1, (255, 0, 0), line_width)
+        if pred_label_wall[i] == 1:
+            cv2.line(img_line2, q0, q1, (0, 255, 0), 2)
+        elif pred_label_wall[i] == 2:
+            cv2.line(img_line2, q0, q1, (255, 0, 0), 2)
+        elif gt_wall[i] == 1 and pred_label_wall[i] == 0:
+            cv2.line(img_line2, q0, q1, (0, 0, 255), 2)
     cv2.imwrite('visual/wall/%02d-gt.png'%(it), img_line)
     cv2.imwrite('visual/wall/%02d-pred.png'%(it), img_line1)
+    cv2.imwrite('visual/wall/%02d-pred-gt.png'%(it), img_line2)
 
 best_acc = 0
 best_acc_wall = 0
