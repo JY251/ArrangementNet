@@ -176,6 +176,7 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
     cv2.imwrite('visual/wall/%02d-gt.png'%(it), img_line)
     cv2.imwrite('visual/wall/%02d-pred.png'%(it), img_line1)
     cv2.imwrite('visual/wall/%02d-pred-gt.png'%(it), img_line2)
+    cv2.imwrite('visual/wall/%02d-pred-gt-both.png'%(it), img_line3)
 
 best_acc = 0
 best_acc_wall = 0
