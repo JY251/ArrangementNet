@@ -165,9 +165,9 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
             cv2.line(img_line2, q0, q1, (255, 0, 0), 2)
         elif gt_wall[i] == 1 and pred_label_wall[i] == 0:
             cv2.line(img_line2, q0, q1, (0, 0, 255), 2)
-        if pred_label_wall[i] == 1 and gt_wall[i] == 1:
+        if pred_label_wall[i] == 1:
             cv2.line(img_line3, q0, q1, (0, 255, 0), 2)
-        elif pred_label_wall[i] == 2 and gt_wall[i] == 1:
+        elif pred_label_wall[i] == 2:
             cv2.line(img_line3, q0, q1, (255, 0, 0), 2)
         elif gt_wall[i] == 1 and pred_label_wall[i] == 0:
             cv2.line(img_line3, q0, q1, (0, 0, 255), 2)
