@@ -197,8 +197,8 @@ def EvalEpoch(epoch):
         pred_label = pred_n[:, 1] > pred_n[:, 0]
         pred_label_wall = pred_e[:, 1] > pred_e[:, 0]
         for i in range(len(pred_label_wall)):
-        if pred_label_wall[i] == 2:
-            print("pred_label_wall = 2: pred_n", pred_n[i])        
+            if pred_label_wall[i] == 2:
+                print("pred_label_wall = 2: pred_n", pred_n[i])        
         if args.eval == 1:
             pred_e_score = softmax(pred_e)[:, 1].data.cpu().numpy().astype('float64')
             pred_n_score = softmax(pred_n)[:, 1].data.cpu().numpy().astype('float64')
