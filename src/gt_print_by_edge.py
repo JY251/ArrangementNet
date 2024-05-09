@@ -55,6 +55,59 @@ else:
     writer = SummaryWriter(logdir=args.logdir + '/summary')
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
+def SaveFloor(sample_batched, pred_label, gt, it):
+    global args
+    p0 = sample_batched['g'].ndata['p0']
+    p1 = sample_batched['g'].ndata['p1']
+    p2 = sample_batched['g'].ndata['p2']
+    amplifier = 1.0
+    if args.dataset == 'cyberverse':
+        amplifier = 20.0
+    p0 = p0.data.cpu().numpy() * amplifier
+    p1 = p1.data.cpu().numpy() * amplifier
+    p2 = p2.data.cpu().numpy() * amplifier
+    gt = gt.data.cpu().numpy()
+    pred = pred_label.data.cpu().numpy()
+    ps = np.concatenate([p0, p1, p2], axis=0)
+    xMin = np.min(ps[:, 0])
+    xMax = np.max(ps[:, 0])
+    yMin = np.min(ps[:, 1])
+    yMax = np.max(ps[:, 1])
+    xMin -= 1
+    yMin -= 1
+    xMax += 1
+    yMax += 1
+
+    resolution = 2e-2
+    h = int((yMax - yMin) / resolution)
+    w = int((xMax - xMin) / resolution)
+    img = np.zeros((h, w), dtype='uint8')
+    img1 = np.zeros((h, w), dtype='uint8')
+    for i in range(gt.shape[0]):
+        bgr = int(gt[i] * 255)
+        triangle = np.zeros((3, 2))
+        triangle[0] = p0[i]
+        triangle[1] = p1[i]
+        triangle[2] = p2[i]
+        triangle[:, 0] = ((triangle[:, 0] - xMin) / resolution)
+        triangle[:, 1] = ((triangle[:, 1] - yMin) / resolution)
+        triangle = triangle.reshape(1, 3, 2).astype('int32')
+        v = int(gt[i] * 255)
+        bgr = [v]
+        triangle = triangle.astype('int32')
+        cv2.fillConvexPoly(img, triangle, bgr)
+        if pred[i] == 1:
+            v = 255
+        elif pred[i] == 2:
+            v = 128
+        else:
+            v = 0
+        bgr = [v]
+        cv2.fillConvexPoly(img1, triangle, bgr)
+    filename = 'visual/floor/%02d-gt.png'%(it)
+    cv2.imwrite(filename, img)
+    filename = 'visual/floor/%02d-pred.png'%(it)
+    cv2.imwrite(filename, img1)
 
 # prints the wall graph with initial and gt wall
 def SaveWall_gt_one_by_one(sample_batched, gt_wall, it):
