@@ -141,6 +141,7 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
     p1 = p1 * amplifier
     pred_label_wall = pred_label_wall.data.cpu().numpy()
     gt_wall = gt_wall.data.cpu().numpy()
+    for i in range(gt_wall.shape[0]):
         q0 = (int((p0[i, 0] - xMin) / resolution), int((p0[i, 1] - yMin) / resolution))
         q1 = (int((p1[i, 0] - xMin) / resolution), int((p1[i, 1] - yMin) / resolution))
         if gt_wall[i] == 1:
@@ -197,7 +198,7 @@ def EvalEpoch(epoch):
         pred_label_wall = pred_e[:, 1] > pred_e[:, 0]
         for i in range(len(pred_label_wall)):
         if pred_label_wall[i] == 2:
-            print("pred_label_wall = 2: pred_n[i] = ", pred_n[i])        
+            print("pred_label_wall = 2: pred_n", pred_n[i])        
         if args.eval == 1:
             pred_e_score = softmax(pred_e)[:, 1].data.cpu().numpy().astype('float64')
             pred_n_score = softmax(pred_n)[:, 1].data.cpu().numpy().astype('float64')
