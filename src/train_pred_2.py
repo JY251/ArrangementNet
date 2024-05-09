@@ -117,6 +117,9 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
     amplifier = 1.0
     if args.dataset == 'cyberverse':
         amplifier = 20.0
+    line_width = 5
+    if args.dataset == 'structured3d':
+        line_width = 1
     p0 = p0.data.cpu().numpy() * amplifier
     p1 = p1.data.cpu().numpy() * amplifier
     p2 = p2.data.cpu().numpy() * amplifier
@@ -135,6 +138,8 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
     w = int((xMax - xMin) / resolution)
     img_line = np.zeros((h, w, 3), dtype='uint8')
     img_line1 = np.zeros((h, w, 3), dtype='uint8')
+    img_line2 = np.zeros((h, w, 3), dtype='uint8')
+    img_line3 = np.zeros((h, w, 3), dtype='uint8')
     p0 = sample_batched['g'].edata['p0'].data.cpu().numpy()
     p1 = sample_batched['g'].edata['p1'].data.cpu().numpy()
     p0 = p0 * amplifier
@@ -144,14 +149,34 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
     for i in range(gt_wall.shape[0]):
         q0 = (int((p0[i, 0] - xMin) / resolution), int((p0[i, 1] - yMin) / resolution))
         q1 = (int((p1[i, 0] - xMin) / resolution), int((p1[i, 1] - yMin) / resolution))
+        cv2.line(img_line, q0, q1, (255, 255, 255), 1)
+        cv2.line(img_line1, q0, q1, (255, 255, 255), 1)
+        cv2.line(img_line2, q0, q1, (255, 255, 255), 1)
+        cv2.line(img_line3, q0, q1, (255, 255, 255), 1)
         if gt_wall[i] == 1:
-            cv2.line(img_line, q0, q1, (255, 255, 255), 1)
+            cv2.line(img_line, q0, q1, (0, 0, 255), line_width)
         if pred_label_wall[i] == 1:
-            cv2.line(img_line1, q0, q1, (255, 255, 255), 1)
+            cv2.line(img_line1, q0, q1, (0, 255, 0), line_width)
         elif pred_label_wall[i] == 2:
-            cv2.line(img_line1, q0, q1, (64, 64, 64), 1)
+            cv2.line(img_line1, q0, q1, (255, 0, 0), line_width)
+        if pred_label_wall[i] == 1:
+            cv2.line(img_line2, q0, q1, (0, 255, 0), 2)
+        elif pred_label_wall[i] == 2:
+            cv2.line(img_line2, q0, q1, (255, 0, 0), 2)
+        elif gt_wall[i] == 1 and pred_label_wall[i] == 0:
+            cv2.line(img_line2, q0, q1, (0, 0, 255), 2)
+        if pred_label_wall[i] == 1:
+            cv2.line(img_line3, q0, q1, (0, 255, 0), 2)
+        elif pred_label_wall[i] == 2:
+            cv2.line(img_line3, q0, q1, (255, 0, 0), 2)
+        elif gt_wall[i] == 1 and pred_label_wall[i] == 0:
+            cv2.line(img_line3, q0, q1, (0, 0, 255), 2)
+        if gt_wall[i] != 1 and pred_label_wall[i] == 1:
+            cv2.line(img_line3, q0, q1, (0, 255, 255), 2)
     cv2.imwrite('visual/wall/%02d-gt.png'%(it), img_line)
     cv2.imwrite('visual/wall/%02d-pred.png'%(it), img_line1)
+    cv2.imwrite('visual/wall/%02d-pred-gt.png'%(it), img_line2)
+    cv2.imwrite('visual/wall/%02d-pred-gt-both.png'%(it), img_line3)
 
 best_acc = 0
 best_acc_wall = 0
@@ -196,9 +221,6 @@ def EvalEpoch(epoch):
         loss = torch.sum(loss * area)
         pred_label = pred_n[:, 1] > pred_n[:, 0]
         pred_label_wall = pred_e[:, 1] > pred_e[:, 0]
-        for i in range(len(pred_label_wall)):
-            if pred_label_wall[i] == 2:
-                print("pred_label_wall = 2: pred_n", pred_n[i])        
         if args.eval == 1:
             pred_e_score = softmax(pred_e)[:, 1].data.cpu().numpy().astype('float64')
             pred_n_score = softmax(pred_n)[:, 1].data.cpu().numpy().astype('float64')
@@ -242,8 +264,13 @@ def EvalEpoch(epoch):
         accs_wall.append(acc_wall)
         loss_wall_arr.append(loss_wall.item())
         if args.eval == 1:
+            print("line 267 ...")
             SaveFloor(sample_batched, pred_label, gt, it)
             SaveWall(sample_batched, pred_label_wall, gt_wall, it)
+            print(pred_label_wall)
+            for i in range(len(pred_label_wall)):
+                if pred_label_wall[i] == 2:
+                    print("pred_label_wall = 2: pred_n", pred_n[i])        
         del sample_batched, pred_n, pred_e, gt, gt_wall, area, loss, pred_label_wall, pred_label, lens, loss_wall
         torch.cuda.empty_cache()
     acc = np.mean(accs)
