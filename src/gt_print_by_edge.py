@@ -110,7 +110,7 @@ def SaveFloor(sample_batched, pred_label, gt, it):
     cv2.imwrite(filename, img1)
 
 # prints the wall graph with initial and gt wall
-def SaveWall(sample_batched, gt_wall, it):
+def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
     global args
     p0 = sample_batched['g'].ndata['p0']
     p1 = sample_batched['g'].ndata['p1']
