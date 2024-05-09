@@ -152,7 +152,7 @@ def SaveWall(sample_batched, pred_label_wall, gt_wall, it):
             gt_edge_count += 1
             img_line = img_line_cp.copy()
             cv2.line(img_line, q0, q1, (0, 0, 255), 5) # BGR colored
-            cv2.imwrite('visual/wall/%02d-%03d-gt.png'%(it)%(gt_edge_count), img_line)
+            cv2.imwrite('visual/wall/%02d-%03d-gt.png'%(it, gt_edge_count), img_line)
 
 best_acc = 0
 best_acc_wall = 0
