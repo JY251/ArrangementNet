@@ -223,6 +223,14 @@ def EvalEpoch(epoch):
                                gtWallLabel=gt_wall.cpu().numpy().astype('int32')[HE2E],
                                predWallLabel=cutE[HE2E])
         loss_wall = F.cross_entropy(pred_e, gt_wall, reduction='none')
+        if it == 5:
+            # print(pred_label_wall)
+            # print(pred_label_wall)
+            # print(pred_label_wall[284])
+            # print(gt_wall[284])
+            print(int(pred_label_wall[284].item()))
+            print(gt_wall[284].item())
+            loss_wall += 100 * abs(int(pred_label_wall[284].item()) - (gt_wall[284].item()))
         lens = sample_batched['g'].edata['len']
         lens[:] = 1
         loss_wall = torch.sum(loss_wall * lens)
